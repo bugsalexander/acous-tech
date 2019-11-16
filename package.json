@@ -1,0 +1,12 @@
+{
+  "name": "acous-tech",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/bugsalexander/acous-tech.git",
+  "author": "meebs <alex@takayamasan.com>",
+  "license": "MIT",
+  "dependencies": {
+    "fs": "^0.0.1-security",
+    "twilio": "^3.37.1"
+  }
+}
