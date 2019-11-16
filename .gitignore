@@ -6,4 +6,5 @@ yarn-error.log*
 
 node_modules/
 
-
+# ignore the credentials file! duh.
+credentials.json
