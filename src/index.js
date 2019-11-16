@@ -1,10 +1,12 @@
-const fs = require('fs');
+const fs = require("fs");
+const http = require("http");
+const express = require ("express");
 
 /**
  * The main function.
  */
 function main() {
-  const credentialsFilePath = "../credentials.json";
+  const credentialsFilePath = "credentials.json";
 
   // read in the file as a JSONObject, with props accountSid and authToken.
   const credentialsFile = fs.readFileSync(credentialsFilePath, "utf-8");
@@ -33,3 +35,7 @@ async function launch(accountSid, authToken, number) {
   const us = number;
 }
 
+
+
+// call the main!!!
+main();
