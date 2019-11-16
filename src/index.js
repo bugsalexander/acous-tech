@@ -1,41 +1,32 @@
-const fs = require("fs");
-const http = require("http");
-const express = require ("express");
+const http = require('http');
+const express = require('express');
+const MessagingResponse = require('twilio').twiml.MessagingResponse;
+const bodyParser = require('body-parser');
+const converter = require('./converter');
 
-/**
- * The main function.
- */
-function main() {
-  const credentialsFilePath = "credentials.json";
+// initialize the express server
+const app = express();
 
-  // read in the file as a JSONObject, with props accountSid and authToken.
-  const credentialsFile = fs.readFileSync(credentialsFilePath, "utf-8");
-  const credentialsObj = JSON.parse(credentialsFile);
-  
-  const accountSid = credentialsObj.accountSid;
-  const authToken = credentialsObj.authToken;
-  const number = credentialsObj.number;
+// use body-parser to parse the contents of the received message.
+app.use(bodyParser.urlencoded({ extended: true })); 
 
-  // launch the server.
-  launch(accountSid, authToken, number);
-}
+// setup a response for sms messages.
+app.post('/sms', (req, res) => {
+    
+  const receivedMsg = req.body.Body;
+  console.log(`Received: ${receivedMsg}`);
 
-/**
- * Launches the main server app.
- * @param {string} accountSid the account sid to use for twilio verification
- * @param {string} authToken the authentication token to use for twilio verification
- * @param {string} number the phone number to send and receive from
- */
-async function launch(accountSid, authToken, number) {
+  const twiml = new MessagingResponse();
 
-  // require twilio.
-  const client = require('twilio')(accountSid, authToken);
+  // do some stuff here! like setting this var to the response.
+  const response = converter.convert(receivedMsg);
 
-  // our number! is a string.
-  const us = number;
-}
+  twiml.message(response);
 
+  res.writeHead(200, {'Content-Type': 'text/xml'});
+  res.end(twiml.toString());
+});
 
-
-// call the main!!!
-main();
+http.createServer(app).listen(1337, () => {
+  console.log('Express server listening on port 1337');
+});
