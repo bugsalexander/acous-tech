@@ -4,9 +4,8 @@
  * Converts a string to emojis.
  * @param {string} toConvert the string to convert to emoji
  */
-async function convert(toConvert) {
+function convert(toConvert) {
 
-    
   const spawn = require("child_process").spawn;
   const pythonProcess = spawn('python',["./conversion.py", toConvert]);
 
