@@ -6,10 +6,17 @@
   "author": "meebs <alex@takayamasan.com>",
   "license": "MIT",
   "dependencies": {
+    "@babel/cli": "^7.7.0",
+    "@babel/core": "^7.7.2",
+    "@babel/preset-env": "^7.7.1",
     "body-parser": "^1.19.0",
+    "child_process": "^1.0.2",
     "express": "^4.17.1",
     "fs": "^0.0.1-security",
     "twilio": "^3.37.1",
     "twilio-cli": "^1.8.2"
+  },
+  "scripts": {
+    "build": "npx babel src --out-dir build"
   }
 }
