@@ -2,7 +2,7 @@ import { createServer } from 'http';
 import express from 'express';
 import { twiml } from 'twilio';
 import { urlencoded } from 'body-parser';
-import { convert } from './converter';
+import { convertSentence } from './converter';
 import "core-js/stable";
 import "regenerator-runtime/runtime";
 import { readFileSync } from "fs";
@@ -22,15 +22,14 @@ const dictionary = JSON.parse(readFileSync("src/mojis.json", "utf-8"));
 // setup a response for sms messages.
 app.post('/sms', async (req, res) => {
     
-  // store and log the received text
+  // store the received message.
   const receivedMsg = req.body.Body;
-  console.log(`Received: ${receivedMsg}`);
 
   // convert the received text into emoji, word by word.
-  let convertedReceived = "";
-  for (const word of receivedMsg.split(" ")) {
-    convertedReceived += `${convert(word, dictionary)} `;
-  }
+  let convertedReceived = await convertSentence(receivedMsg, dictionary);
+
+  // log the converted and the received.
+  console.log(`${receivedMsg} -> ${convertedReceived}`);
 
   // create the response
   const response = new MessagingResponse();
