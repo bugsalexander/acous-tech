@@ -5,6 +5,7 @@ import { urlencoded } from 'body-parser';
 import { convert } from './converter';
 import "core-js/stable";
 import "regenerator-runtime/runtime";
+import { readFileSync } from "fs";
 
 // the messaging response, from twiml/twilio
 const MessagingResponse = twiml.MessagingResponse;
@@ -15,6 +16,9 @@ const app = express();
 // use body-parser to parse the contents of the received message.
 app.use(urlencoded({ extended: true })); 
 
+// store the dictionary
+const dictionary = JSON.parse(readFileSync("src/mojis.json", "utf-8"));
+
 // setup a response for sms messages.
 app.post('/sms', async (req, res) => {
     
@@ -22,8 +26,11 @@ app.post('/sms', async (req, res) => {
   const receivedMsg = req.body.Body;
   console.log(`Received: ${receivedMsg}`);
 
-  // convert the received text into emoji. 
-  const convertedReceived = await convert(receivedMsg);
+  // convert the received text into emoji, word by word.
+  let convertedReceived = "";
+  for (const word of receivedMsg.split(" ")) {
+    convertedReceived += `${convert(word, dictionary)} `;
+  }
 
   // create the response
   const response = new MessagingResponse();
