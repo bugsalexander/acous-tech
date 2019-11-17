@@ -1,32 +1,40 @@
-const http = require('http');
-const express = require('express');
-const MessagingResponse = require('twilio').twiml.MessagingResponse;
-const bodyParser = require('body-parser');
-const converter = require('./converter');
+import { createServer } from 'http';
+import express from 'express';
+import { twiml } from 'twilio';
+import { urlencoded } from 'body-parser';
+import { convert } from './converter';
+
+// the messaging response, from twiml/twilio
+const MessagingResponse = twiml.MessagingResponse;
 
 // initialize the express server
 const app = express();
 
 // use body-parser to parse the contents of the received message.
-app.use(bodyParser.urlencoded({ extended: true })); 
+app.use(urlencoded({ extended: true })); 
 
 // setup a response for sms messages.
 app.post('/sms', (req, res) => {
     
+  // store and log the received text
   const receivedMsg = req.body.Body;
   console.log(`Received: ${receivedMsg}`);
 
-  const twiml = new MessagingResponse();
+  // convert the received text into emoji.
+  const convertedReceived = convert(receivedMsg);
 
-  // do some stuff here! like setting this var to the response.
-  const response = converter.convert(receivedMsg);
+  // create the response
+  const response = new MessagingResponse();
 
-  twiml.message(response);
+  // set the response's message to the converted emoji
+  twiml.message(convertedReceived);
 
+  // send.
   res.writeHead(200, {'Content-Type': 'text/xml'});
   res.end(twiml.toString());
 });
 
-http.createServer(app).listen(1337, () => {
+// launch the server!
+createServer(app).listen(1337, () => {
   console.log('Express server listening on port 1337');
 });
