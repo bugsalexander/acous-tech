@@ -8,3 +8,6 @@ node_modules/
 
 # ignore the credentials file! duh.
 credentials.json
+
+# ignore the build
+build/
