@@ -58,9 +58,11 @@ function convert(toConvert, dictionary) {
       minDistance = distance;
     }
   }
-
-  // return the best emoji.
-  return bestEmoji;
+  // return the best emoji only if its 0.
+  if (minDistance  === 0) {
+    return bestEmoji;
+  }
+  
 }
 
 /**
