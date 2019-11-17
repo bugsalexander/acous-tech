@@ -1,4 +1,34 @@
 // this module exports a function that converts from a string to its matching emoji.
+import { spawn } from "child_process";
+
+/**
+ * Converts a sentence of space-separated words to emojis, including lemmatization.
+ * @param {string} sentence the sentence to convert
+ * @param {Object} dictionary the dictionary object, contaisn properties "keys" and "values" that map to arrays.
+ */
+export function convertSentence(sentence, dictionary) {
+
+  // downcases the sentence
+  sentence = sentence.toLowerCase();
+  
+  // spawn the python process
+  const pythonProcess = spawn('python3', ["src/lemmatization.py", `\"${sentence}\"`]);
+  
+  // return a promise, resolved with the converted result.
+  return new Promise((resolve, reject) => {
+    pythonProcess.stdout.on('data', (data) => {
+  
+      // for each word, convert to emoji.
+      let result = "";
+      for (const word of String(data).split(" ")) {
+        result += `${convert(word, dictionary)} `;
+      }
+
+      // resolve with the result.
+      resolve(result);
+    });
+  });
+}
 
 /**
  * Converts a string to emojis.
@@ -6,10 +36,7 @@
  * @param {Object} dictionary the dictionary object, contains properties "keys" and "values" that map to arrays.
  * @returns a promise, resolved with the converted emoji string.
  */
-export function convert(toConvert, dictionary) {
-
-  // the emoji converter can only convert lowercase strings.
-  const lowercase = toConvert.toLowerCase();
+function convert(toConvert, dictionary) {
 
   // the keys/values of the dictionary. keys[i] -> values[i]
   const keys = dictionary.keys;
