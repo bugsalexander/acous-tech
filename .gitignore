@@ -11,3 +11,9 @@ credentials.json
 
 # ignore the build
 build/
+
+# ignore python files
+src/conversion.py
+src/emo_uni.py
+src/glove.6B.300d.txt
+src/__pycache__/emo_uni.cpython-37.pyc
