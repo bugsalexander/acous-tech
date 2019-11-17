@@ -2,11 +2,75 @@
 import { spawn } from "child_process";
 
 /**
- * Converts a sentence of space-separated words to emojis, including lemmatization.
+ * Converts the sentence to the emoji version.
  * @param {string} sentence the sentence to convert
- * @param {Object} dictionary the dictionary object, contaisn properties "keys" and "values" that map to arrays.
+ * @param {Object} dictionary the dictionary of emojis and their names
  */
-export function convertSentence(sentence, dictionary) {
+export async function convertSentence(sentence, dictionary) {
+
+  const words = sentence.split(" ");
+
+  // map to words
+  const converted = words.map((word) => takeBest(word, dictionary));
+
+  const resolved = await Promise.all(converted);
+
+  // get rid of words that are undefined.
+  let result = "";
+  for (const word of resolved) {
+    if (word) {
+      result += `${word} `;
+    }
+  }
+
+  return result;
+}
+
+/**
+ * given a word, if the best edit distance is zero, return.
+ * otherwise, for each synonym, compute edit distance. 
+ * if the min of synonyms' edit distance is better (less than) the original, return new emoji. 
+ * else return original.
+ * @param {string} word the word to convert
+ * @param {Object} dictionary the dictionary of emojis and their names
+ */
+async function takeBest(word, dictionary) {
+
+  // lemmatize the word
+  // if word is empty or undefined, then use the original.
+  let lemmatized = await lemmatize(word);
+  if (lemmatized === undefined || lemmatized === "") {
+    lemmatized = word;
+  }
+
+  // the edit of the distance of the actual word
+  const best = convert(lemmatized, dictionary);
+
+  // if best is zero, return.
+  if (best.minDistance === 1) {
+    return best.emoji;
+  }
+
+  // otherwise, for each synonym compute the edit distance (keeping the min).
+  const synonymsList = await synonyms(lemmatized);
+  console.log(synonymsList);
+  for (const synonym of synonymsList) {
+    const synDist = convert(synonym, dictionary);
+    if (synDist.minDistance === 1) {
+      return synDist.emoji;
+    }
+  }
+
+  // return the best.
+  return word;
+}
+
+/**
+ * Returns a Promise resolved with the lemmatized sentence.
+ * @param {string} sentence the sentence to convert
+ * @returns a promise resolved with the lemmatized sentence.
+ */
+function lemmatize(sentence) {
 
   // downcases the sentence
   sentence = sentence.toLowerCase();
@@ -17,24 +81,42 @@ export function convertSentence(sentence, dictionary) {
   // return a promise, resolved with the converted result.
   return new Promise((resolve, reject) => {
     pythonProcess.stdout.on('data', (data) => {
-  
-      // for each word, convert to emoji.
-      let result = "";
-      for (const word of String(data).split(" ")) {
-        result += `${convert(word, dictionary)} `;
-      }
-
-      // resolve with the result.
-      resolve(result);
+      
+      // resolve with the result, split by spaces, as an array.
+      resolve(data);
     });
   });
 }
 
 /**
- * Converts a string to emojis.
+ * Retrieves the synonyms of a word
+ * @param {string} word the word 
+ * @returns a promise resolved with an array of the synonyms of the word.
+ */
+function synonyms(word) {
+  word = String(word);
+
+  // downcases the sentence
+  word = word.toLowerCase();
+  
+  // spawn the python process
+  const pythonProcess = spawn('python3', ["src/synonyms.py", `\"${word}\"`]);
+  
+  // return a promise, resolved with the converted result.
+  return new Promise((resolve, reject) => {
+    pythonProcess.stdout.on('data', (data) => {
+      
+      // resolve with the result, split by spaces, as an array.
+      resolve(JSON.parse(data));
+    });
+  });
+}
+
+/**
+ * Produces an object with the minimum edit distance found in the dictionary, along with the emoji result.
  * @param {string} toConvert the string to convert to emoji
  * @param {Object} dictionary the dictionary object, contains properties "keys" and "values" that map to arrays.
- * @returns a promise, resolved with the converted emoji string.
+ * @returns an object containing the minimum edit distance, along with the emoji.
  */
 function convert(toConvert, dictionary) {
 
@@ -50,17 +132,20 @@ function convert(toConvert, dictionary) {
   for (let i = 0; i < keys.length; i += 1) {
 
     // for each word in the dictionary, compute the edit distance.
-    let distance = editDistance(toConvert, keys[i]);
+    let distance = editDistance(String(toConvert), keys[i]);
 
     // if it's less than the min, store the corresponding emoji.
     if (distance < minDistance) {
-      bestEmoji = dictionary.values[i];
+      bestEmoji = values[i];
       minDistance = distance;
     }
   }
 
   // return the best emoji.
-  return bestEmoji;
+  return {
+    minDistance: minDistance,
+    emoji: bestEmoji
+  };
 }
 
 /**
