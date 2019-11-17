@@ -14,12 +14,14 @@
     "core-js": "^3.4.1",
     "express": "^4.17.1",
     "fs": "^0.0.1-security",
+    "jest": "^24.9.0",
     "regenerator-runtime": "^0.13.3",
     "twilio": "^3.37.1",
     "twilio-cli": "^1.8.2"
   },
   "scripts": {
     "build": "npx babel src --out-dir build",
-    "launch": "yarn build && node build/index.js"
+    "launch": "yarn build && node build/index.js",
+    "test": "jest"
   }
 }

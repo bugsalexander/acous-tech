@@ -34,7 +34,7 @@ export async function convertSentence(sentence, dictionary) {
  * @param {string} word the word to convert
  * @param {Object} dictionary the dictionary of emojis and their names
  */
-async function takeBest(word, dictionary) {
+export async function takeBest(word, dictionary) {
 
   // lemmatize the word
   // if word is empty or undefined, then use the original.
@@ -70,10 +70,7 @@ async function takeBest(word, dictionary) {
  * @param {string} sentence the sentence to convert
  * @returns a promise resolved with the lemmatized sentence.
  */
-function lemmatize(sentence) {
-
-  // downcases the sentence
-  sentence = sentence.toLowerCase();
+export function lemmatize(sentence) {
   
   // spawn the python process
   const pythonProcess = spawn('python3', ["src/lemmatization.py", `\"${sentence}\"`]);
@@ -93,7 +90,7 @@ function lemmatize(sentence) {
  * @param {string} word the word 
  * @returns a promise resolved with an array of the synonyms of the word.
  */
-function synonyms(word) {
+export function synonyms(word) {
   word = String(word);
 
   // downcases the sentence
@@ -107,6 +104,7 @@ function synonyms(word) {
     pythonProcess.stdout.on('data', (data) => {
       
       // resolve with the result, split by spaces, as an array.
+      console.log(data);
       resolve(JSON.parse(data));
     });
   });
@@ -118,7 +116,7 @@ function synonyms(word) {
  * @param {Object} dictionary the dictionary object, contains properties "keys" and "values" that map to arrays.
  * @returns an object containing the minimum edit distance, along with the emoji.
  */
-function convert(toConvert, dictionary) {
+export function convert(toConvert, dictionary) {
 
   // the keys/values of the dictionary. keys[i] -> values[i]
   const keys = dictionary.keys;
@@ -154,7 +152,7 @@ function convert(toConvert, dictionary) {
  * @param {string} a the first word
  * @param {string} b the second word
  */
-function editDistance(a, b) {
+export function editDistance(a, b) {
   if(a.length == 0) return b.length; 
   if(b.length == 0) return a.length; 
 
