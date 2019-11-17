@@ -8,7 +8,7 @@
 export function convert(toConvert) {
 
   // the emoji converter can only convert lowercase strings.
-  const lowercase = String.toLowerCase(toConvert);
+  const lowercase = toConvert.toLowerCase();
 
   // create the child python process, and pipe it some input.
   const spawn = require("child_process").spawn;
