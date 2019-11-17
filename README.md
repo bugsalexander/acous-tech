@@ -5,7 +5,7 @@ A visual representation of your acoustic environment.
 
 First run `yarn install` to install the needed dependencies for the project.
 
-Next, run (in a separate terminal tab) `node src/server.js`. This will launch 
+Next, run (in a separate terminal tab) `yarn launch`. This will compile and launch 
 the express server, which automatically listens on port 1337.
 
 Now we need to configure `twilio-cli` so that we can receive and respond to texts from our express server.
