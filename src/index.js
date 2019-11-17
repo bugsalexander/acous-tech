@@ -3,6 +3,8 @@ import express from 'express';
 import { twiml } from 'twilio';
 import { urlencoded } from 'body-parser';
 import { convert } from './converter';
+import "core-js/stable";
+import "regenerator-runtime/runtime";
 
 // the messaging response, from twiml/twilio
 const MessagingResponse = twiml.MessagingResponse;
@@ -14,24 +16,24 @@ const app = express();
 app.use(urlencoded({ extended: true })); 
 
 // setup a response for sms messages.
-app.post('/sms', (req, res) => {
+app.post('/sms', async (req, res) => {
     
   // store and log the received text
   const receivedMsg = req.body.Body;
   console.log(`Received: ${receivedMsg}`);
 
-  // convert the received text into emoji.
-  const convertedReceived = convert(receivedMsg);
+  // convert the received text into emoji. 
+  const convertedReceived = await convert(receivedMsg);
 
   // create the response
   const response = new MessagingResponse();
 
   // set the response's message to the converted emoji
-  twiml.message(convertedReceived);
+  response.message(convertedReceived);
 
   // send.
   res.writeHead(200, {'Content-Type': 'text/xml'});
-  res.end(twiml.toString());
+  res.end(response.toString());
 });
 
 // launch the server!
