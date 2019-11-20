@@ -1,5 +1,5 @@
 # acous-tech
-A visual representation of your acoustic environment.
+Emojis galore! A text-to-emoji converter on the go, wherever you need it (cause you need it).
 
 # how to run the twilio app:
 
