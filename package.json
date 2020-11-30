@@ -14,7 +14,7 @@
     "core-js": "^3.4.1",
     "express": "^4.17.1",
     "fs": "^0.0.1-security",
-    "regenerator-runtime": "^0.13.3",
+    "regenerator-runtime": "^0.13.7",
     "twilio": "^3.37.1",
     "twilio-cli": "^1.8.2"
   },
