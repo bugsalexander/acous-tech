@@ -16,7 +16,7 @@
     "fs": "^0.0.1-security",
     "regenerator-runtime": "^0.13.7",
     "twilio": "^3.51.0",
-    "twilio-cli": "^2.15.0"
+    "twilio-cli": "^2.15.1"
   },
   "scripts": {
     "build": "npx babel src --out-dir build",
